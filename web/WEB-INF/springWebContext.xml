@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
+
+    <mvc:annotation-driven/>
+
+    <context:component-scan base-package="controllers"/>
+    <!--<context:component-scan base-package="dao"/>-->
+    <context:component-scan base-package="services"/>
+    <context:component-scan base-package="entity"/>
+
+    <import resource="persistenceJpaConfig.xml"/>
+
+    <import resource="securityConfig.xml"/>
+
+    <!--<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">-->
+        <!--<property name="viewClass"-->
+                  <!--value="org.springframework.web.servlet.view.JstlView"/>-->
+        <!--<property name="prefix" value="WEB-INF/pages/"/>-->
+        <!--<property name="suffix" value=".jsp"/>-->
+    <!--</bean>-->
+
+    <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
+
+    <bean class="org.springframework.oxm.xstream.XStreamMarshaller" id="oxmMarshaller"/>
+
+    <bean class="org.springframework.http.converter.xml.MarshallingHttpMessageConverter" id="marshallingHttpMessageConverter">
+        <property name="marshaller" ref="oxmMarshaller"/>
+        <property name="unmarshaller" ref="oxmMarshaller"/>
+    </bean>
+
+    <bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+        <property name="messageConverters">
+            <util:list id="beanList">
+                <ref bean="marshallingHttpMessageConverter"/>
+            </util:list>
+        </property>
+    </bean>
+
+    <bean id="outboundExceptionAdapter"  class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerExceptionResolver"/>
+    <bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver" />
+</beans>

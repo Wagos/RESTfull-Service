@@ -1,0 +1,50 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:security="http://www.springframework.org/schema/security"
+
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+
+        http://www.springframework.org/schema/data/jpa  http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/security  http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+    <!---->
+    <bean id="digestFilter" class=
+            "org.springframework.security.web.authentication.www.DigestAuthenticationFilter">
+        <property name="userDetailsService" ref="loginUserService"/>
+        <property name="authenticationEntryPoint" ref="digestEntryPoint"/>
+        <!--<property name="userCache" ref="userCache"/>-->
+    </bean>
+
+    <bean id="digestEntryPoint" class=
+            "org.springframework.security.web.authentication.www.DigestAuthenticationEntryPoint">
+        <property name="realmName" value="Contacts Realm via Digest Authentication"/>
+        <property name="key" value="acegi"/>
+        <property name="nonceValiditySeconds" value="10"/>
+    </bean>
+
+    <bean id="loginUserService" class="services.UserDetailsServiceImpl"/>
+    <!--<bean id="encoder" class="org.springframework.security.crypto.password.StandardPasswordEncoder"/>-->
+
+    <security:authentication-manager>
+        <security:authentication-provider user-service-ref="loginUserService">
+            <!--<security:password-encoder ref="encoder"/>-->
+        </security:authentication-provider>
+    </security:authentication-manager>
+
+    <security:http entry-point-ref="digestEntryPoint">
+        <!--<security:form-login login-processing-url="/static/j_spring_security_check"-->
+                             <!--login-page="/LoginPage"/>-->
+        <security:http-basic/>
+        <security:custom-filter ref="digestFilter" after="BASIC_AUTH_FILTER" />
+        <!--<security:intercept-url pattern="/roles/**" access="ROLE_ADMIN"/>-->
+        <!--<security:intercept-url pattern="/users/**" access="ROLE_USER"/>-->
+        <!--<security:intercept-url pattern="/registration/**" access="ROLE_DEFAULT"/>-->
+    </security:http>
+
+    <security:global-method-security secured-annotations="enabled" />
+</beans>
